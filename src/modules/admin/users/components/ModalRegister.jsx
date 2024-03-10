@@ -20,6 +20,7 @@ const ModalRegister = ({ open, onClose }) => {
             birthdate:'',
             avatar:''
         },
+
         validationSchema: yup.object().shape({
             username:yup.string().required("Campo obligatorio").max(45,"Solo se permiten 45 caracteres").min(4,"minimo 4 caracteres"),
             password:yup.string().required("Campo obligatorio").min(8,"Minimo 8 caracteres").max(50,"Solo se permiten 50 caracteres"),
@@ -31,6 +32,7 @@ const ModalRegister = ({ open, onClose }) => {
             curp:yup.string().required("Campo obligatorio").min(18,"Minimo 18 caracteres").max(18,"Máximo 18 caracteres"),
             birthdate:yup.string().required("Campo obligatorio"),
         }),
+
         onSubmit: async (values,{seSubmitting}) =>{
             console.log(values);
         },
@@ -49,7 +51,7 @@ const ModalRegister = ({ open, onClose }) => {
                 <Modal.Header>REGISTER</Modal.Header>
                 <Modal.Body>
                     <div className=''>
-                        <form className="flex w-full">
+                        <form className="flex w-full" noValidate onSubmit={formik.handleSubmit}>
                             <div className='flex w-1/2'>
                                 <Card className='flex w-full'>
                                     <div className='flex mt-3 bg-gray-100 w-full font-bold justify-center'>
@@ -97,7 +99,17 @@ const ModalRegister = ({ open, onClose }) => {
                                         <div className="mb-2 block">
                                             <Label htmlFor="username" value="user name" />
                                         </div>
-                                        <TextInput id="username" name='username' type="text" placeholder='name user' required />
+                                        <TextInput id="username" name='username' type="text" placeholder='name user' required
+                                        value={formik.values.username}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        helperText={
+                                            formik.touched.username && formik.errors.username ? 
+                                            (<span className='text-sm text-red-600'>
+                                                {formik.errors.username}
+                                            </span>):null
+                                        }
+                                        />
                                     </div>
                                     <div className='mt-3'>
                                         <div className="mb-2 block">

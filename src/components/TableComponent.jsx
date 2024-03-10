@@ -10,10 +10,12 @@ const Loading = () => {
     </div>
   );
 };
+
 const Opttions = {
     rowsPerPageText: 'Filas por página',
     rangeSeparatorText: 'de',
 }
+
 
 const TableComponent = ({ columns, data, onSort, progress }) => {
   return (

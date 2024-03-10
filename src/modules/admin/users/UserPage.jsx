@@ -55,6 +55,7 @@ const UserPage = () => {
                     <Button outline size={"sm"} pill color="warning">
                         {<AiFillEdit />}
                     </Button>
+
                     <Button
                         outline
                         size={"sm"}
@@ -67,6 +68,7 @@ const UserPage = () => {
             ),
         },
     ]);
+    
     const getUSer = async () => {
         try {
             setLoading(true);
