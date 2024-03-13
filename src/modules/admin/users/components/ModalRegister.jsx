@@ -33,17 +33,11 @@ const ModalRegister = ({ open, onClose }) => {
             curp: yup.string().required("Campo obligatorio").min(18, "Minimo 18 caracteres").max(18, "Máximo 18 caracteres"),
             birthdate: yup.string().required("Campo obligatorio").test("Demasiada edad","Parece que eres muy viejo",
             function (value) {        
-                 // Parsea la fecha de nacimiento en milisegundos
                 const fechaIngresada = Date.parse(value);
-                // Calcula la fecha actual en milisegundos
                 const fechaActual = Date.now();
-                // Calcula la diferencia de tiempo en milisegundos
                 const diferencia = fechaActual - fechaIngresada;
-                // Calcula la edad en años
                 const edad = Math.floor(diferencia / (1000 * 60 * 60 * 24 * 365.25));
-                // Define el límite de edad (90 años en este caso)
                 const limiteEdad = 90;
-                // Comprueba si la edad es mayor que el límite
                 return edad <= limiteEdad;}
             ) ,
         }),
