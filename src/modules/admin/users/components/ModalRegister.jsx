@@ -2,10 +2,17 @@ import { Button, Label, TextInput, Modal, FileInput, Card, Select } from 'flowbi
 import { Formik, useFormik } from 'formik';
 import React, { useState } from 'react';
 import * as yup from "yup";
+import { confirmAlert, customAlert } from '../../../../config/alert/alert';
+import AxiosCliente from '../../../../config/htpp-gateway/http-client';
 
-const ModalRegister = ({ open, onClose }) => {
+const ModalRegister = ({ open, onClose,getAllUsers }) => {
+    const closeModal = () =>{
+        formik.resetForm();
+        onClose();
+    }
+     
+    const [submitting,setSubmitting] = useState(false);
     const [imagePreview, setImagePreview] = useState("");
-    const [openModal, setOpenModal] = useState(false);
     const [modalPlacement, setModalPlacement] = useState('center')
 
     const formik = useFormik({
@@ -27,7 +34,7 @@ const ModalRegister = ({ open, onClose }) => {
             password: yup.string().required("Campo obligatorio").min(8, "Minimo 8 caracteres").max(50, "Solo se permiten 50 caracteres"),
             confirmPassword: yup.string().test("confirm password",
                 "las contraseñas no coindicen ", function (value) { return this.parent.password === value; }),
-            role: yup.string().required("Campo obligatorio").test("Selecciona un rol", "Debes escoger un rol", function (value) { return value !== "Selecciona un rol" }),
+            role: yup.string().required("Campo obligatorio").test("Selecciona un rol", "Debes escoger un rol", function (value) { return !!value }),
             name: yup.string().required("Campo obligatorio").min(3, "Minimo 3 caracteres").max(50, "maximo 50 caracteres"),
             surname: yup.string().required("Campo obligatorio").min(3, "Minimo 3 caracteres").max(50, "Máximo 50 caracteres"),
             curp: yup.string().required("Campo obligatorio").min(18, "Minimo 18 caracteres").max(18, "Máximo 18 caracteres"),
@@ -39,11 +46,55 @@ const ModalRegister = ({ open, onClose }) => {
                 const edad = Math.floor(diferencia / (1000 * 60 * 60 * 24 * 365.25));
                 const limiteEdad = 90;
                 return edad <= limiteEdad;}
+            ).test("Muy poca edad edad","Parece que eres muy joven",
+            function (value) {        
+                const fechaIngresada = Date.parse(value);
+                const fechaActual = Date.now();
+                const diferencia = fechaActual - fechaIngresada;
+                const edad = Math.floor(diferencia / (1000 * 60 * 60 * 24 * 365.25));
+                const limiteEdad = 18;
+                return edad >= limiteEdad;}
             ) ,
         }),
 
         onSubmit: async (values, { seSubmitting }) => {
-            console.log(values);
+            confirmAlert(async () =>{
+                try {
+                //values que son los datos planos se construye como objeto de persoa que dentro de persona 
+                //values -> person{user: {}}
+                const payload = {
+                    ...values,
+                    birthDate: values.birthdate,
+                    user:{
+                        username: values.username,
+                        password: values.password,
+                        avatar: values.avatar,
+                        roles: [{id: values.role}],
+                    }
+
+                }
+                
+                const response = await AxiosCliente({
+                    method:'POST',
+                    url: "/person/",
+                    data: payload
+                });
+                if(!response.error){
+                    customAlert('Registrado correctamente',
+                    'Usuario registrado correctamente'
+                    ,'success');
+                    getAllUsers();
+                    closeModal();
+                }
+                } catch (error) {
+                    customAlert('Error al registrar el usuario',
+                    'Error al registrar, intentalo mas tarde'
+                    ,'error')
+                    console.log(error);
+                }finally{
+                    setSubmitting(false);
+                }
+            })
         },
     })
 
@@ -138,7 +189,7 @@ const ModalRegister = ({ open, onClose }) => {
                                                     (<span className='text-sm text-red-600'>
                                                         {formik.errors.surname}
                                                     </span>) : null
-                                            }
+                                            } 
                                         />
                                     </div>
                                     <div>
@@ -212,10 +263,9 @@ const ModalRegister = ({ open, onClose }) => {
                                                     </span>) : null
                                             }
                                         >
-                                            <option>Selecciona un rol</option>
-                                            <option>ADMIN_ROLE</option>
-                                            <option>USER_ADMIN</option>
-                                            <option>CLIENT_ADMIN</option>
+                                            <option value="1">ADMIN_ROLE</option>
+                                            <option value="3">USER_ADMIN</option>
+                                            <option value="2">CLIENT_ADMIN</option>
                                         </Select>
                                     </div>
                                     <div>
@@ -276,7 +326,7 @@ const ModalRegister = ({ open, onClose }) => {
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button color="gray" onClick={onClose}>
+                    <Button color="gray" onClick={onClose} disabled={formik.isSubmitting || !formik.isValid}>
                         Cancelar
                     </Button>
                 </Modal.Footer>

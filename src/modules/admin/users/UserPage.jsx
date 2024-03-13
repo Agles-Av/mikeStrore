@@ -128,6 +128,7 @@ const UserPage = () => {
             <ModalRegister
             open={openRegisterModal}
             onClose={() => setOpenRegisterModal(false)}
+            getAllUsers={getUSer}
             />
         </>
     );
