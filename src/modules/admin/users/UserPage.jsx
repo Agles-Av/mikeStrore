@@ -2,6 +2,7 @@ import { Button, Badge, TextInput, Label, Card } from "flowbite-react";
 import React, { useEffect, useMemo, useState } from "react";
 import AxiosCliente from "../../../config/htpp-gateway/http-client";
 import TableComponent from "../../../components/TableComponent";
+import { customAlert,confirmAlert } from "../../../config/alert/alert";
 import {
     AiFillEdit,
     AiOutlineDelete,
@@ -15,6 +16,7 @@ const UserPage = () => {
     const [users, setUsers] = useState([]);
     const [filterText, setFilterText] = useState("");
     const [openRegisterModal, setOpenRegisterModal] = useState(false);
+    const [submitting,setSubmitting] = useState(false);
 
 
     //con el useMemo se gaurda una imagen de las colunbas para que sili se rederizen una vez
@@ -61,6 +63,8 @@ const UserPage = () => {
                         size={"sm"}
                         pill
                         color={row.status ? "failure" : "success"}
+                        onClick={()=> changeUser(row.id)}
+                        
                     >
                         {row.status ? <AiOutlineDelete /> : <AiOutlineDoubleLeft />}
                     </Button>
@@ -68,6 +72,31 @@ const UserPage = () => {
             ),
         },
     ]);
+
+    const changeUser = async (id)  => {
+        confirmAlert (async =>{
+            try {
+                getUSer();
+    
+                const response =  AxiosCliente({
+                    method:"PATCH",
+                    url:"/user/"+id,
+                });
+                console.log(response);
+                if(!response.error){
+                    customAlert('Registrado correctamente',
+                    'Usuario registrado correctamente'
+                    ,'success');
+                    getUSer();
+                }
+            } catch (error) {
+                customAlert('Error al cambiar el estado',
+                'Error al cambiar estado, intentalo mas tarde'
+                ,'error')
+                console.log(error);
+            }
+        })
+    }
     
     const getUSer = async () => {
         try {

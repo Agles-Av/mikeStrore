@@ -57,7 +57,7 @@ const ModalRegister = ({ open, onClose,getAllUsers }) => {
             ) ,
         }),
 
-        onSubmit: async (values, { seSubmitting }) => {
+        onSubmit: async (values, { setSubmitting }) => {
             confirmAlert(async () =>{
                 try {
                 //values que son los datos planos se construye como objeto de persoa que dentro de persona 
