@@ -10,13 +10,16 @@ import {
 } from "react-icons/ai";
 import { FaSearch, FaPlus } from "react-icons/fa";
 import ModalRegister from "./components/ModalRegister";
+import ModalUpdate from "./components/ModalUpdate";
 
-const UserPage = () => {
+const UserPage = ({row}) => {
     const [loading, setLoading] = useState(false);
     const [users, setUsers] = useState([]);
     const [filterText, setFilterText] = useState("");
     const [openRegisterModal, setOpenRegisterModal] = useState(false);
+    const [openRegisterModalU, setOpenRegisterModalU] = useState(false);
     const [submitting,setSubmitting] = useState(false);
+    const [rowData, setRowData] = useState(null);
 
 
     //con el useMemo se gaurda una imagen de las colunbas para que sili se rederizen una vez
@@ -54,7 +57,11 @@ const UserPage = () => {
             name: "Acciones",
             cell: (row) => (
                 <>
-                    <Button outline size={"sm"} pill color="warning">
+                    <Button 
+                    outline size={"sm"} 
+                    pill color="warning"
+                    onClick={() => openEditModal(row)}
+                    >
                         {<AiFillEdit />}
                     </Button>
 
@@ -97,6 +104,11 @@ const UserPage = () => {
             }
         })
     }
+
+  const openEditModal = (rowData) => {
+    setRowData(rowData); // Almacena el rowData seleccionado en el estado
+    setOpenRegisterModalU(true);
+  };
     
     const getUSer = async () => {
         try {
@@ -158,6 +170,12 @@ const UserPage = () => {
             open={openRegisterModal}
             onClose={() => setOpenRegisterModal(false)}
             getAllUsers={getUSer}
+            />
+            <ModalUpdate
+            openU={openRegisterModalU}
+            getAllUsersU={getUSer}
+            onCloseU={() => setOpenRegisterModalU(false)}
+            rowData={rowData}
             />
         </>
     );
